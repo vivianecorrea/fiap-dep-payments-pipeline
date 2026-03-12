@@ -4,17 +4,17 @@ import pyspark.sql.functions as F
 from pyspark.sql.types import (
     StructType, StructField,
     StringType, IntegerType, BooleanType,
-    TimestampType, DoubleType
+    TimestampType, DoubleType, DecimalType
 )
 
-ORDERS_PATH = "./datasets-csv-pedidos/data/pedidos/"
-PAYMENTS_PATH = "./dataset-json-pagamentos/data/pagamentos/"
-OUTPUT_PATH = "./output/sales_report_2025"
+ORDERS_PATH = "datasets/datasets-csv-pedidos/data/pedidos/"
+PAYMENTS_PATH = "datasets/dataset-json-pagamentos/data/pagamentos/"
+OUTPUT_PATH = "datasets/output/sales_report_2025/"
 
 orders_schema = StructType([
     StructField("ID_PEDIDO", StringType(), True),
     StructField("PRODUTO", StringType(), True),
-    StructField("VALOR_UNITARIO", StringType(), True),
+    StructField("VALOR_UNITARIO", DecimalType(10,2), True),
     StructField("QUANTIDADE", StringType(), True),
     StructField("DATA_CRIACAO", StringType(), True),
     StructField("UF", StringType(), True),
@@ -26,15 +26,15 @@ payments_schema = StructType([
         "avaliacao_fraude",
         StructType([
             StructField("fraude", BooleanType(), True),
-            StructField("score", DoubleType(), True),
+            StructField("score", StringType(), True),
         ]),
         True
     ),
     StructField("data_processamento", StringType(), True),
     StructField("forma_pagamento", StringType(), True),
     StructField("id_pedido", StringType(), True),
-    StructField("status", BooleanType(), True),
-    StructField("valor_pagamento", DoubleType(), True),
+    StructField("status", StringType(), True),
+    StructField("valor_pagamento", DecimalType(10,2), True),
 ])
 
 def main():
@@ -55,6 +55,7 @@ def main():
         .schema(orders_schema)
         .load(ORDERS_PATH)
     )
+    df_orders.show(n=50, truncate= False )
 
     df_payments = (
         spark.read
@@ -63,6 +64,7 @@ def main():
         .schema(payments_schema)
         .load(PAYMENTS_PATH)
     )
+    df_payments.show(n=3)
 
     df_orders_silver = (
         df_orders
@@ -71,11 +73,12 @@ def main():
             F.col("UF").alias("state"),
             F.to_timestamp("DATA_CRIACAO", "yyyy-MM-dd'T'HH:mm:ss").alias("order_date"),
             (
-                F.col("VALOR_UNITARIO").cast("double") *
-                F.col("QUANTIDADE").cast("int")
+                (F.col("VALOR_UNITARIO").cast("double") *
+                F.col("QUANTIDADE").cast("int")).cast(DecimalType(10,2))
             ).alias("order_total")
         )
     )
+    
 
     df_payments_silver = (
         df_payments
