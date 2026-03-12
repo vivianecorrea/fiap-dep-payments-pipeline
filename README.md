@@ -8,7 +8,7 @@ The final report includes only orders created in **2025** and is sorted by **sta
 
 
 # Project Structure
-
+```
 fiap-dep-payments-pipeline
 │
 ├── src
@@ -26,7 +26,7 @@ fiap-dep-payments-pipeline
 ├── datasets
 ├── requirements.txt
 └── README.md
-
+```
 
 # Environment Setup
 
