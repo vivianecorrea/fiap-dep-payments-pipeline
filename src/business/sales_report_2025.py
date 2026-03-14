@@ -70,16 +70,16 @@ class SalesReportBuilder:
                 how="inner",
             )
             .select(
-                F.col("order_id"),
-                F.col("state"),
-                F.col("payment_method"),
-                F.col("order_total"),
-                F.col("order_date"),
+                F.col("order_id").alias("id_pedido"),
+                F.col("state").alias("UF"),
+                F.col("payment_method").alias("forma_pagamento"),
+                F.col("order_total").alias("valor_total"),
+                F.col("order_date").alias("data_pedido"),
             )
             .orderBy(
-                F.col("state").asc(),
-                F.col("payment_method").asc(),
-                F.col("order_date").asc(),
+                F.col("UF").asc(),
+                F.col("forma_pagamento").asc(),
+                F.col("data_pedido").asc(),
             )
         )
 
@@ -162,28 +162,48 @@ def main() -> None:
 
     spark.sparkContext.setLogLevel("WARN")
 
-    df_orders = (
+    # Bronze: leitura bruta
+    df_orders_bronze = (
         spark.read
         .format("csv")
         .option("compression", "gzip")
         .option("sep", ";")
         .option("header", True)
-        .schema(orders_schema)
         .load(ORDERS_PATH)
     )
-
-    df_payments = (
+    df_payments_bronze = (
         spark.read
         .format("json")
         .option("compression", "gzip")
-        .schema(payments_schema)
         .load(PAYMENTS_PATH)
     )
+    
+    print("Bronze - Pedidos:")
+    df_orders_bronze.show(5, truncate=False)
+    df_orders_bronze.printSchema()
+    df_orders_bronze.write.mode("overwrite").parquet("datasets/output/bronze_pedidos/")
+    
+    print("Bronze - Pagamentos:")
+    df_payments_bronze.show(5, truncate=False)
+    df_payments_bronze.printSchema()
+    df_payments_bronze.write.mode("overwrite").parquet("datasets/output/bronze_pagamentos/")
+
+    # Silver: leitura dos dados da bronze e aplicação de schema e datatype corretos
+    df_orders_silver = spark.read.parquet("datasets/output/bronze_pedidos/")
+    df_orders_silver = df_orders_silver.withColumn("VALOR_UNITARIO", F.col("VALOR_UNITARIO").cast(DecimalType(10, 2)))
+    df_orders_silver = spark.createDataFrame(df_orders_silver.rdd, schema=orders_schema)
+    df_payments_silver = spark.read.parquet("datasets/output/bronze_pagamentos/")
+    df_payments_silver = df_payments_silver.withColumn("valor_pagamento", F.col("valor_pagamento").cast(DecimalType(10, 2)))
+    df_payments_silver = spark.createDataFrame(df_payments_silver.rdd, schema=payments_schema)
 
     report_builder = SalesReportBuilder(
-        payments_df=df_payments,
-        orders_df=df_orders,
+        payments_df=df_payments_silver,
+        orders_df=df_orders_silver,
     )
+    
+    orders_silver_df = report_builder._build_orders_silver(report_builder._build_orders_typed())
+    payments_silver_df = report_builder._build_payments_silver(report_builder._build_payments_typed())
+    print("Silver - Orders:")
 
     df_report = report_builder.build_report()
 
