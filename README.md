@@ -52,14 +52,14 @@ pip install -r requirements.txt
 
 Before running the pipeline, download the source datasets:
 
-sh ./scripts/setup_datasets.sh
+sh ./scripts/setup_datasets.sh 
 
 
 # Running the Pipeline
 
 Run the pipeline with:
 
-python src/sales.py
+python -m src.business.sales_report_2025
 
 The report will be saved in:
 
