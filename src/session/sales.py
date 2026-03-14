@@ -9,11 +9,12 @@ from pyspark.sql.types import (
     BooleanType,
     DecimalType,
 )
+from config.settings import carregar_config
 
-
-ORDERS_PATH = "datasets/datasets-csv-pedidos/data/pedidos/"
-PAYMENTS_PATH = "datasets/dataset-json-pagamentos/data/pagamentos/"
-OUTPUT_PATH = "datasets/output/sales_report_2025/"
+config = carregar_config()
+app_name = config['spark']['app_name']
+print(f"Obtido o app name: {app_name}")
+spark = SparkSession.builder.appName(app_name).getOrCreate()
 
 
 orders_schema = StructType([
