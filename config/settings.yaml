@@ -1,0 +1,15 @@
+# src/config/settings.yaml
+spark:
+  app_name: "Analise de Vendas"
+
+paths:
+  payments: "./fiap-dep-payments-pipeline/datasets/datasets-json-pagamentos/data/pagamentos/"
+  orders: "./fiap-dep-payments-pipeline/datasets/datasets-csv-pedidos/data/pedidos/"
+  output: "./fiap-dep-payments-pipeline/datasets/output/sales_report_2025"
+
+file_options:
+  pedidos_csv:
+    compression: "gzip"
+    header: True
+    sep: ";"
+    
