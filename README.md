@@ -52,7 +52,7 @@ pip install -r requirements.txt
 
 Before running the pipeline, download the source datasets:
 
-python scripts/setup_datasets.py
+sh ./scripts/setup_datasets.sh
 
 
 # Running the Pipeline
