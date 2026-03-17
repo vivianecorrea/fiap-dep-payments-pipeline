@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from src.sales import SalesReportBuilder
+from src.business.sales_report import SalesReportBuilder
 
 
 def test_should_calculate_order_total_correctly(
@@ -9,7 +9,7 @@ def test_should_calculate_order_total_correctly(
     orders_schema,
 ):
     payments_data = [
-        ({"fraude": False, "score": "10"}, "2025-06-10T12:00:00", "pix", "1", "false", "30.00"),
+        ({"fraude": "false", "score": "10"}, "2025-06-10T12:00:00", "pix", "1", "false", "30.00"),
     ]
 
     orders_data = [
@@ -19,10 +19,10 @@ def test_should_calculate_order_total_correctly(
     df_payments = spark_session.createDataFrame(payments_data, payments_schema)
     df_orders = spark_session.createDataFrame(orders_data, orders_schema)
 
-    result = SalesReportBuilder(
-        payments_df=df_payments,
+    result = SalesReportBuilder().build_report(
         orders_df=df_orders,
-    ).build_report()
+        payments_df=df_payments,
+    )
 
     row = result.collect()[0]
 
@@ -45,10 +45,10 @@ def test_should_round_order_total_to_two_decimal_places(
     df_payments = spark_session.createDataFrame(payments_data, payments_schema)
     df_orders = spark_session.createDataFrame(orders_data, orders_schema)
 
-    result = SalesReportBuilder(
-        payments_df=df_payments,
+    result = SalesReportBuilder().build_report(
         orders_df=df_orders,
-    ).build_report()
+        payments_df=df_payments,
+    )
 
     row = result.collect()[0]
 
