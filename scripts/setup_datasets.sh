@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_DIR="/home/ubuntu/environment/fiap-dep-payments-pipeline"
+PROJECT_DIR="/home/ec2-user/environment/fiap-dep-payments-pipeline"
 DATASETS_DIR="$PROJECT_DIR/datasets"
 
 echo "Going to project directory..."
