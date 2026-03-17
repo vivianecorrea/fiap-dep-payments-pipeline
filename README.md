@@ -73,7 +73,7 @@ pip install -r requirements.txt
 Before running the pipeline, download the source datasets:
 
 ```bash
-sh .scripts/setup_datasets.sh
+sh ./scripts/setup_datasets.sh
 ```
 
 The datasets will be placed under `fiap-dep-payments-pipeline/datasets/`.
@@ -107,18 +107,4 @@ With verbose output:
 
 ```bash
 pytest -v
-```
-
----
-
-## Installing as a Package
-
-```bash
-pip install -e .
-```
-
-Once installed, the pipeline can also be run as:
-
-```bash
-payments-pipeline
 ```
