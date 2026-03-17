@@ -1,4 +1,4 @@
-from src.sales import SalesReportBuilder
+from src.business.sales_report import SalesReportBuilder
 
 
 def test_should_keep_only_orders_with_refused_payment_and_legitimate_fraud_analysis(
@@ -21,10 +21,10 @@ def test_should_keep_only_orders_with_refused_payment_and_legitimate_fraud_analy
     df_payments = spark_session.createDataFrame(payments_data, payments_schema)
     df_orders = spark_session.createDataFrame(orders_data, orders_schema)
 
-    result = SalesReportBuilder(
-        payments_df=df_payments,
+    result = SalesReportBuilder().build_report(
         orders_df=df_orders,
-    ).build_report()
+        payments_df=df_payments,
+    )
 
     result_order_ids = [row.order_id for row in result.collect()]
 
@@ -51,10 +51,10 @@ def test_should_keep_only_orders_created_in_2025(
     df_payments = spark_session.createDataFrame(payments_data, payments_schema)
     df_orders = spark_session.createDataFrame(orders_data, orders_schema)
 
-    result = SalesReportBuilder(
-        payments_df=df_payments,
+    result = SalesReportBuilder().build_report(
         orders_df=df_orders,
-    ).build_report()
+        payments_df=df_payments,
+    )
 
     result_order_ids = [row.order_id for row in result.collect()]
 
@@ -83,10 +83,10 @@ def test_should_include_orders_on_2025_boundary_dates(
     df_payments = spark_session.createDataFrame(payments_data, payments_schema)
     df_orders = spark_session.createDataFrame(orders_data, orders_schema)
 
-    result = SalesReportBuilder(
-        payments_df=df_payments,
+    result = SalesReportBuilder().build_report(
         orders_df=df_orders,
-    ).build_report()
+        payments_df=df_payments,
+    )
 
     result_order_ids = [row.order_id for row in result.collect()]
 

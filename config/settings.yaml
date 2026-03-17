@@ -1,0 +1,28 @@
+# config/settings.yaml
+
+spark:
+  app_name: "Payments Report"
+  log_level: "WARN"
+
+pipeline:
+  report_year: 2025
+
+sources:
+  orders:
+    path: "./datasets/datasets-csv-pedidos/data/pedidos/"
+    format: "csv"
+    options:
+      header: "true"
+      sep: ";"
+      compression: "gzip"
+
+  payments:
+    path: "./datasets/dataset-json-pagamentos/data/pagamentos/"
+    format: "json"
+    options: {}
+
+sink:
+  sales_report:
+    path: "./datasets/output/sales_report"
+    format: "parquet"
+    mode: "overwrite"

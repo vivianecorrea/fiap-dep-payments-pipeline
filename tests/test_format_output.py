@@ -1,6 +1,4 @@
-from decimal import Decimal
-
-from src.sales import SalesReportBuilder
+from src.business.sales_report import SalesReportBuilder
 
 
 def test_should_return_only_required_report_columns(
@@ -41,12 +39,10 @@ def test_should_return_only_required_report_columns(
         schema=orders_schema,
     )
 
-    report_builder = SalesReportBuilder(
-        payments_df=df_payments,
+    report_df = SalesReportBuilder().build_report(
         orders_df=df_orders,
+        payments_df=df_payments,
     )
-
-    report_df = report_builder.build_report()
 
     expected_columns = [
         "order_id",
@@ -86,12 +82,10 @@ def test_should_sort_report_by_uf_payment_method_and_order_date(
         schema=orders_schema,
     )
 
-    report_builder = SalesReportBuilder(
-        payments_df=df_payments,
+    result = SalesReportBuilder().build_report(
         orders_df=df_orders,
+        payments_df=df_payments,
     )
-
-    result = report_builder.build_report()
 
     result_order = [
         (row.state, row.payment_method, row.order_date)
